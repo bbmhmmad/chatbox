@@ -1,0 +1,134 @@
+<html>
+<head>
+<title></title>
+    <style type="text/css">
+        @import url(https://fonts.googleapis.com/css?family=Bungee);
+        #logo {
+          font-family: 'Open Sans', sans-serif;
+          color: #555;
+          text-decoration: none;
+          text-transform: uppercase;
+          font-size: 125px;
+          font-weight: 400;
+          letter-spacing: -3px;
+          line-height: 1;
+          text-shadow: #EDEDED 3px 2px 0;
+          position: relative;
+        }
+        #logo:after {
+          content:"Conversation Board";
+          position: absolute;
+          left: 8px;
+          top: 32px;
+        }
+        #logo:after {
+          /*background: url(http://subtlepatterns.com/patterns/crossed_stripes.png) repeat;*/
+          background-image: -webkit-linear-gradient(left top, transparent 0%, transparent 25%, #555 25%, #555 50%, transparent 50%, transparent 75%, #555 75%);
+          background-size: 4px 4px;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          z-index: -5;
+          display: block;
+          text-shadow: none;
+        }
+      h1{
+        border-style: solid;
+        text-align: center;
+
+      }
+
+      div.tchat_display {
+      padding: 10px 10px 10px 10px;
+      font-size: 25px;
+      padding-bottom: 10px;
+      word-wrap: break-word;
+      overflow: scroll;
+      font-family: 'Bungee';
+    }
+
+        * {
+          font-family: 'Bungee';
+          margin: 0;
+          padding: 0;
+          font-size: 20px;
+        }
+
+        body {
+          background-image: url('http://pimg.imagesia.com/fichiers/1ct/background_imagesia-com_1ct9d.png');
+          position: absolute;
+          top: 0;
+          left: 0;
+          height: 100%;
+          width: 100%;
+        }
+
+    </style>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script type ="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script type ="text/javascript">
+
+        $(document).ready(function (){
+            var count = 0
+            var name=prompt('Name')
+
+            var socket = io.connect();
+            console.log('SOCKET OBJECT',socket)
+            if (name){
+                socket.emit('new_user',{data:name})
+                
+            }
+
+            socket.on('announcement',function(data){
+                $('#messages').prepend(function(){return '<p>' + 'User Joined: ' + data.newbie + '</p>'});
+
+            })
+
+            $('#submit').click(function(){
+                socket.emit('new_message',{name:name,message:$('#message').val()})
+
+                // console.log('DID WE GET NAME',name)
+                // console.log('DID we get MESSAGE',$('#message').val())
+            })
+            
+            socket.on('show_message',function(data){
+
+                if (count==0){   
+                    for (var i = 0; i<data.all_messages.length;i++){
+                        $('#messages').append(function(){
+                            console.log('MESSAGES ARE',data.all_messages)
+                            count++
+                            return "<div>" + data.all_messages[i].name + ' : ' + data.all_messages[i].message + "</div>" + '<hr>';
+                            
+                        } )
+
+                    }
+                } 
+
+                else {
+                    $('#messages').append(function(){
+                            console.log('MESSAGES ARE',data.all_messages)
+                            return "<div>" + data.all_messages[data.all_messages.length-1].name + ' : ' + data.all_messages[data.all_messages.length-1].message + "</div>" + '<hr>';
+                            
+                        } )
+
+                }
+
+
+                
+            })
+
+            
+        })
+    </script>
+</head>
+    <body>
+        <div id = 'logo'><h1>Conversation Board</h1></div>
+        <input type="text" name="message" id='message'> 
+        <input type="submit" id='submit' value='Send a Message'>
+        <div id='messages' class='tchat_display'>
+            
+        </div>
+
+
+    </body>
+</html>
