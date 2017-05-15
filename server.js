@@ -10,7 +10,7 @@ app.get('/',function(req,res){
 	res.render('index')
 })
 
-var server =app.listen(8000,function(){
+var server =app.listen(process.env.PORT || 8000,function(){
 	'Port is listening on 8000'
 })
 
